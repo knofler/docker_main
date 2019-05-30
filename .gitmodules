@@ -1,0 +1,9 @@
+[submodule "react_aircanteen"]
+	path = react_aircanteen
+	url = git@github.com:knofler/react_aircanteen.git
+[submodule "mern_aircanteen"]
+	path = mern_aircanteen
+	url = git@github.com:knofler/mern_aircanteen.git
+[submodule "cli"]
+	path = cli
+	url = git@github.com:knofler/cli.git
