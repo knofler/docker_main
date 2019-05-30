@@ -1,0 +1,72 @@
+version: '3.4'
+services:
+  api:
+    build:
+      context: ./mern_aircanteen/
+      dockerfile: Dockerfile
+      target: development
+    depends_on:
+      - db
+    ports:
+      - "${WEB_PORT:-8080}:8000"
+      - 8082:8082
+    volumes:
+      - ./mern_aircanteen/client:/usr/src/app/client
+      - ./mern_aircanteen/Intl:/usr/src/app/Intl
+      - ./mern_aircanteen/generators:/usr/src/app/generators
+      - ./mern_aircanteen/server:/usr/src/app/server
+      - ./mern_aircanteen/.babelrc:/usr/src/app/.babelrc
+      - ./mern_aircanteen/index.js:/usr/src/app/index.js
+      - ./mern_aircanteen/nodemon.json:/usr/src/app/nodemon.json
+      - ./mern_aircanteen/package.json:/usr/src/app/package.json
+      - ./mern_aircanteen/package-lock.json:/usr/src/app/package-lock.json
+      - ./mern_aircanteen/webpack.config.babel.js:/usr/src/app/webpack.config.babel.js
+      - ./mern_aircanteen/webpack.config.dev.js:/usr/src/app/webpack.config.dev.js
+      - ./mern_aircanteen/webpack.config.prod.js:/usr/src/app/webpack.config.prod.js
+      - ./mern_aircanteen/webpack.config.server.js:/usr/src/app/webpack.config.server.js
+    environment:
+      NODE_ENV: development
+      MONGO_URL: mongodb://db:27017/mern_aircanteen
+      API_URL: http://localhost:8080/api/posts
+      CORS_ORIGINS: http://localhost
+    stdin_open: true
+    tty: true
+  db:
+    image: mongo:latest
+    volumes:
+      - dbdata:/data/db
+    ports:
+      - '27018:27017'
+  app:
+    build:
+      context: ./react_aircanteen/
+      args:
+        REACT_APP_API_URL: http://192.168.99.100:8080/api/
+    #secrets:
+    expose:
+      - '3000/tcp'
+    ports:
+      - '3000:3000'
+    volumes:
+      - $PWD/react_aircanteen/app:/react_aircanteen/app
+      - $PWD/react_aircanteen/internals:/react_aircanteen/internals
+    entrypoint: ['yarn', 'run', 'start']
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3000']
+      interval: 2m
+      timeout: 10s
+      retries: 3
+      start_period: 1m
+  proxy:
+    build:
+      context: ./proxy/
+    ports:
+      - '80:80'
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost']
+      interval: 1m
+      timeout: 3s
+      retries: 3
+      start_period: 1m
+volumes:
+  dbdata:
