@@ -29,6 +29,9 @@ services:
       MONGO_URL: mongodb://db:27017/mern_aircanteen
       API_URL: http://localhost:8080/api/posts
       CORS_ORIGINS: http://localhost
+      AWS_ACCESS_KEY_ID: ${AWS_ACCESS_KEY_ID}
+      AWS_SECRET_ACCESS_KEY: ${AWS_SECRET_ACCESS_KEY}
+      AWS_REGION: ${AWS_REGION}
     stdin_open: true
     tty: true
   db:
